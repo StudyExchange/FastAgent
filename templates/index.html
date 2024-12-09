@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAgent Robot</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}">
+</head>
+
+<body>
+    <h1>FastAgent Robot</h1>
+    <div class="chat-container">
+        <div class="chat-box" id="chat-box">
+            <!-- Chat messages will be displayed here -->
+        </div>
+        <form id="chat-form">
+            <textarea id="message-input" placeholder="Type your message..."></textarea>
+            <button type="submit" id="send-button">Send</button>
+            <button type="button" id="clear-button">Clear</button>
+        </form>
+    </div>
+
+    <script src="{{ url_for('static', path='/script.js') }}"></script>
+</body>
+
+</html>

@@ -1,0 +1,17 @@
+
+fastapi[all]
+uvicorn[standard]
+python-multipart
+httpx
+requests
+pydantic_settings
+
+loguru
+gunicorn
+openpyxl
+pytest
+pandas
+
+aiohttp
+redis
+openai
