@@ -1,24 +1,14 @@
 # FastAgent
-This is a lightweight and fast agent framework based on FastAPI. Instead of using LangChain or AutoGen, it treats a set of APIs as tools, directly extracts the parameters from these APIs, and then calls the respective API interfaces.
+This is a lightweight, fast, high-concurrency agent framework based on FastAPI. Instead of using LangChain or AutoGen, it **treats a set of APIs as tools**, directly extracts the parameters from these APIs, and then calls the respective API interfaces.
 
 
-## Features
-- By default, interfaces containing 'tool' in 'tag' are considered as callable tools.
+## Features 😎
+- By default, interfaces containing "tool" in "tag" are considered as callable tools.
 - If the tool cannot be called, return a final answer. The final answer may be for the user to provide additional information, or it may be based on the ability of the large model itself to directly answer the user's question.
+- High-concurrency asynchronous based on FastAPI.
 
 
-## Useage
-Open ```http://127.0.0.1:8000/frontend/``` at local browser.
-<img src="./assets/LLM call func.png">
-<img src="./assets/LLM answer.png">
-
-
-## Swagger docs
-Open ```http://127.0.0.1:8000/docs``` at local browser.
-<img src="./assets/SwaggerUI.png">
-
-
-## Quickstart
+## Quickstart 🚀
 - Download repository
 ```
 git clone https://github.com/StudyExchange/fastagent.git
@@ -34,19 +24,19 @@ pip install -r requirements.txt
 ```
 export OPENAI_API_KEY="sk-xxx"
 export OPENAI_BASE_URL="https://xxx/v1"
-export OPENAI_MODEL_NAME="gpt4-o-mini"
+export OPENAI_MODEL_NAME="gpt-4o-mini"
 ```
 or for windows
 ```
 set OPENAI_API_KEY="sk-xxx"
 set OPENAI_BASE_URL="https://xxx/v1"
-set OPENAI_MODEL_NAME="gpt4-o-mini"
+set OPENAI_MODEL_NAME="gpt-4o-mini"
 ```
 or for pydantic_settings ```.env``` file
 ```
 OPENAI_API_KEY="sk-xxx"
 OPENAI_BASE_URL="https://xxx/v1"
-OPENAI_MODEL_NAME="gpt4-o-mini"
+OPENAI_MODEL_NAME="gpt-4o-mini"
 ```
 or for VScode ```launch.json``` environment
 ```
@@ -64,7 +54,7 @@ or for VScode ```launch.json``` environment
                 "PYTHONPATH": "${workspaceFolder}",
                 "OPENAI_API_KEY"="sk-xxx",
                 "OPENAI_BASE_URL"="https://xxx/v1",
-                "OPENAI_MODEL_NAME"="gpt4-o-mini",
+                "OPENAI_MODEL_NAME"="gpt-4o-mini",
             },
         }
     ]
@@ -79,6 +69,18 @@ or
 ```
 uvicorn main:app --host 0.0.0.0 --port 8000
 ```
+- Open [frontend](http://127.0.0.1:8000/frontend) or [swaggerUI](http://127.0.0.1:8000/docs)
+
+
+## Useage
+Open ```http://127.0.0.1:8000/frontend``` at local browser.
+<img src="./assets/LLM call func.png">
+<img src="./assets/LLM answer.png">
+
+
+## Swagger docs
+Open ```http://127.0.0.1:8000/docs``` at local browser.
+<img src="./assets/SwaggerUI.png">
 
 
 ## Docker
@@ -92,11 +94,29 @@ docker build -t fastagent .
 docker run -it -p 8000:8000 fastagent
 ```
 
+
 ## Suport LLM
 - GPT
 - Qwen
 - GLM
 - Other LLM with standard openai API
+
+
+## Development 🛠️
+- Clone the repository
+- Open project folder in VSCode
+- Create conda env and VSCode select env
+- ```pip install -r requirements.txt```
+- **Develop new APIs as tools**
+- Modify prompt for custom advanced develpment
+
+
+## Test
+- Run pytest
+```
+pytest --cov --cov-report=term --cov-report=html
+```
+- Open the ```htmlcov/index.html``` file with a browser to view code coverage
 
 
 ## Contributing

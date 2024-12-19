@@ -5,6 +5,7 @@ class Settings(BaseSettings):
     app_name: str = "FastAgent"
     version: str = "0.1"
     max_retry: int = 3
+    timeout: int = 60
     llm_temperature: float = 0.7
     llm_top_p: float = 0.9
     llm_max_tokens4output: int = 1500

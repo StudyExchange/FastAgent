@@ -67,5 +67,6 @@ docs/_build/
 # PyBuilder
 target/
 
+data/
 *.out
 .env
