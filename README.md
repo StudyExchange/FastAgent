@@ -5,6 +5,7 @@ This is a lightweight, fast, high-concurrency agent framework based on FastAPI. 
 ## Features 😎
 - By default, interfaces containing "tool" in "tag" are considered as callable tools.
 - If the tool cannot be called, return a final answer. The final answer may be for the user to provide additional information, or it may be based on the ability of the large model itself to directly answer the user's question.
+- ReAct for planing and reasoning.
 - High-concurrency asynchronous based on FastAPI.
 
 
@@ -84,6 +85,13 @@ Open ```http://127.0.0.1:8000/docs``` at local browser.
 
 
 ## Docker
+- create ```.env``` file at project folder, or setup environments when docker container start
+```
+OPENAI_API_KEY="sk-xxx"
+OPENAI_BASE_URL="https://xxx/v1"
+OPENAI_MODEL_NAME="gpt-4o-mini"
+```
+
 - build
 ```
 docker build -t fastagent .
@@ -92,6 +100,14 @@ docker build -t fastagent .
 - docker run
 ```
 docker run -it -p 8000:8000 fastagent
+```
+or
+```
+docker run -it -p 8000:8000 \
+  -e OPENAI_API_KEY="sk-xxx" \
+  -e OPENAI_BASE_URL="https://xxx/v1" \
+  -e OPENAI_MODEL_NAME="gpt-4o-mini" \
+  fastagent
 ```
 
 
@@ -117,10 +133,6 @@ docker run -it -p 8000:8000 fastagent
 pytest --cov --cov-report=term --cov-report=html
 ```
 - Open the ```htmlcov/index.html``` file with a browser to view code coverage
-
-
-## Contributing
-Contributions are welcome! Please feel free to submit a Pull Request.
 
 
 ## License

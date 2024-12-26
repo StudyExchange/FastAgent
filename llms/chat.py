@@ -7,7 +7,7 @@ import httpx
 from config import settings
 
 
-async def chat_with_llm(message_arr: List[dict]) -> str:
+async def chat_with_llm(messages: List[dict]) -> str:
     async with httpx.AsyncClient() as client:
         headers = {
             "Authorization": f"Bearer {settings.openai_api_key}",
@@ -17,7 +17,7 @@ async def chat_with_llm(message_arr: List[dict]) -> str:
         url = f"{base_url}/chat/completions"
         payload = {
             "model": settings.openai_model_name,
-            "messages": message_arr,
+            "messages": messages,
             "max_tokens": settings.llm_max_tokens4output,
             "temperature": settings.llm_temperature,
             "top_p": settings.llm_top_p,

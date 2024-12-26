@@ -28,6 +28,7 @@ Final Answer: The area of the square with a side length of 5 cm is 25 square cen
                 {"action_name": "calculate_triangle_area_geometry_triangle_area__post", "action_arguments": {"base": 4, "height": 6}},
             ],
             "final_answer": "The area of the square with a side length of 5 cm is 25 square centimeters, and the area of the triangle with a base of 4 cm and a height of 6 cm is 12 square centimeters.",
+            "finished": "",
         }
         assert res == expected
 
@@ -45,6 +46,7 @@ Final Answer: The area of the square with a side length of 5 cm is 25 square cen
         expected = {
             "actions": [{"action_name": "calculate_square_area_geometry_square_area__post", "action_arguments": {"side": 5}}],
             "final_answer": "The area of the square with a side length of 5 cm is 25 square centimeters.",
+            "finished": "",
         }
         assert res == expected
 
@@ -55,7 +57,11 @@ Thought: The user has asked for the final answer directly.
 Final Answer: The final answer is provided without any calculations.
 """
         res = get_action_param(text)
-        expected = {"actions": [], "final_answer": "The final answer is provided without any calculations."}
+        expected = {
+            "actions": [],
+            "final_answer": "The final answer is provided without any calculations.",
+            "finished": "",
+        }
         assert res == expected
 
     def test_invalid_action_input(self):
@@ -72,6 +78,7 @@ Final Answer: The calculation could not be performed due to invalid input.
         expected = {
             "actions": [{"action_name": "calculate_square_area_geometry_square_area__post", "action_arguments": {"side": "five"}}],
             "final_answer": "The calculation could not be performed due to invalid input.",
+            "finished": "",
         }
         assert res == expected
 
@@ -84,5 +91,9 @@ Action Input: {"side": 5}
 Observation: {"area": 25}
 """
         res = get_action_param(text)
-        expected = {"actions": [{"action_name": "calculate_square_area_geometry_square_area__post", "action_arguments": {"side": 5}}], "final_answer": ""}
+        expected = {
+            "actions": [{"action_name": "calculate_square_area_geometry_square_area__post", "action_arguments": {"side": 5}}],
+            "final_answer": "",
+            "finished": "",
+        }
         assert res == expected

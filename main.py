@@ -1,3 +1,4 @@
+import copy
 import re
 from typing import Any, List, Optional
 
@@ -12,6 +13,7 @@ from termcolor import colored
 from config import settings
 from entities.message import Message
 from llms.chat import chat_with_llm
+from llms.prompt import PROMPT_ANSWER, PROMPT_REACT, PROMPT_TOOL, TOOL_DESC
 from llms.tool_call import (
     execute_tool,
     get_messages4answer,
@@ -19,7 +21,6 @@ from llms.tool_call import (
     get_tool_from_api,
 )
 from routes import geometry
-from utils.request import get_json
 
 app = FastAPI()
 app.include_router(geometry.router)
@@ -42,16 +43,54 @@ async def index(request: Request):
 async def chat(messages: List[Message], request: Request):
     if not messages:
         raise HTTPException(status_code=422, detail="messages is empty")
-    message_arr = [item.model_dump() for item in messages]
+    messages = [item.model_dump() for item in messages]
     openapi_json = app.openapi()
     tools = get_tool_from_api(openapi_json)
-    messages4tool = get_messages4tool(message_arr, tools)
+    messages4tool = get_messages4tool(messages, tools, PROMPT_TOOL)
     intention_response = await chat_with_llm(messages4tool)
     print(colored(intention_response, "red"))
     base_url = f"{request.url.scheme}://{request.url.netloc}"
     tool_response = await execute_tool(intention_response, tools, base_url)
     print(colored(tool_response, "red"))
-    messages4answer = get_messages4answer(message_arr, tool_response)
+    messages4answer = get_messages4answer(messages, tool_response, PROMPT_ANSWER)
+    response = await chat_with_llm(messages4answer)
+    print(colored(response, "red"))
+    return response
+
+
+@app.post("/react/", tags=["root"])
+async def react(request: Request, messages: List[Message], max_iterations: int = 3):
+    if not messages:
+        raise HTTPException(status_code=422, detail="messages is empty")
+    if max_iterations < 0:
+        raise HTTPException(status_code=422, detail="max_iterations must larger than 0")
+
+    messages = [item.model_dump() for item in messages]
+    openapi_json = app.openapi()
+    tools = get_tool_from_api(openapi_json)
+    base_url = f"{request.url.scheme}://{request.url.netloc}"
+
+    messages4react = copy.deepcopy(messages)
+    tool_responses = []
+    for idx in range(max_iterations):
+        print(colored(f"Think step {idx+1}:", "blue"))
+
+        messages4tool = get_messages4tool(messages4react, tools, PROMPT_REACT)
+        intention_response = await chat_with_llm(messages4tool)
+        # messages4react.append({"role": "assistant", "content": intention_response})
+        print(colored(intention_response, "red"))
+
+        tool_response = await execute_tool(intention_response, tools, base_url)
+        tool_responses.append(tool_response)
+        messages4react.append({"role": "assistant", "content": tool_response})
+        print(colored(tool_response, "red"))
+
+        if tool_response.get("finished", "").lower() == "true":
+            print(colored(f"Think step {idx+1}: finished!", "blue"))
+            break
+
+    # Final response: Generate the final answer
+    messages4answer = get_messages4answer(messages, tool_responses, PROMPT_ANSWER)
     response = await chat_with_llm(messages4answer)
     print(colored(response, "red"))
     return response

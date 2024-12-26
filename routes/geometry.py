@@ -3,7 +3,7 @@ from fastapi import APIRouter, Body, FastAPI, File, HTTPException, UploadFile
 router = APIRouter()
 
 
-@router.get("/geometry/hello/", tags=["geometry"], summary="hello geometry, verify this API module works ok.")
+@router.get("/geometry/hello/", tags=["geometry"], summary="hello geometry.")
 async def get_hello():
     return "geometry works OK!"
 

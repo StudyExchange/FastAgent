@@ -6,19 +6,18 @@ from typing import Dict, List
 import aiohttp
 from termcolor import colored
 
-from llms.prompt import PROMPT_ANSWER, PROMPT_REACT, TOOL_DESC
-from utils.request import get_json, post_json
+from llms.prompt import TOOL_DESC
 
 
-def get_messages4tool(messages, tools):
-    prompt = generate_action_prompt(messages, tools)
+def get_messages4tool(messages, tools, prompt):
+    prompt = generate_action_prompt(messages, tools, prompt)
     print(colored(prompt, "green"))
     messages4tool = [{"role": "user", "content": prompt}]
     return messages4tool
 
 
-def get_messages4answer(messages, tool_result):
-    prompt = PROMPT_ANSWER.format(tool_result=json.dumps(tool_result))
+def get_messages4answer(messages, tool_result, prompt):
+    prompt = prompt.format(tool_result=json.dumps(tool_result))
     print(colored(prompt, "green"))
     messages4answer = messages + [
         {
@@ -30,7 +29,7 @@ def get_messages4answer(messages, tool_result):
 
 
 def get_tool_from_api(openapi_json):
-    tool_arr = []
+    tools = []
     for path_key, path_val in openapi_json["paths"].items():
         for method_key, method_val in path_val.items():
             if "tool" not in method_val.get("tags", []):
@@ -40,11 +39,11 @@ def get_tool_from_api(openapi_json):
             tool["path_key"] = path_key
             tool["method_key"] = method_key
             tool["method_val"] = method_val
-            tool_arr.append(tool)
-    return tool_arr
+            tools.append(tool)
+    return tools
 
 
-def generate_action_prompt(query, tools):
+def generate_action_prompt(messages, tools, prompt):
     tool_descs = []
     tool_names = []
 
@@ -62,11 +61,19 @@ def generate_action_prompt(query, tools):
     tool_descs_str = "\n\n".join(tool_descs)
     tool_names_str = ",".join(tool_names)
     history = []
-    if len(query) > 1:
-        history = query[:-1]
-    query = query[-1:]
-    action_prompt = PROMPT_REACT.format(tool_descs=tool_descs_str, tool_names=tool_names_str, query=query, history=history)
+    if len(messages) > 1:
+        history = messages[:-1]
+    messages = messages[-1:]
+    action_prompt = prompt.format(tool_descs=tool_descs_str, tool_names=tool_names_str, query=messages, history=history)
     return action_prompt
+
+
+def is_finished(tool_response: str) -> bool:
+    completion_keywords = ["Task complete", "Finished", "All done"]
+    for keyword in completion_keywords:
+        if keyword in tool_response:
+            return True
+    return False
 
 
 def extract_actions(text):
@@ -89,14 +96,23 @@ def extract_final_answer(text):
     return ""
 
 
+def extract_finished(text):
+    final_answer_match = re.search(r"Finished:\s*(.*)\n", text, re.DOTALL)
+    if final_answer_match:
+        return final_answer_match.group(1).strip()
+    return ""
+
+
 def get_action_param(text: str):
     actions = extract_actions(text)
     final_answer = extract_final_answer(text)
-    return {"actions": actions, "final_answer": final_answer}
+    finished = extract_finished(text)
+    return {"actions": actions, "final_answer": final_answer, "finished": finished}
 
 
 async def execute_tool(response: str, tools: List[Dict], base_url: str) -> Dict:
     plugin_config = get_action_param(response)
+    plugin_config["status_code"] = 200
     tool_map = {tool["name_for_model"]: tool for tool in tools}
     tool_results = []
     for action in plugin_config.get("actions", []):
@@ -107,10 +123,11 @@ async def execute_tool(response: str, tools: List[Dict], base_url: str) -> Dict:
             result = await execute_tool_request(tool, base_url, action_arguments)
             tool_results.append(result)
     if tool_results:
-        return tool_results
+        plugin_config["tool_results"] = tool_results
+        return plugin_config
     final_answer = plugin_config.get("final_answer")
     if final_answer:
-        return {"status_code": 200, "result": final_answer}
+        return plugin_config
     return {"status_code": 500, "msg": "No final_answer tool found"}
 
 
