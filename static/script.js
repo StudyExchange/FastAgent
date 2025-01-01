@@ -1,46 +1,46 @@
-let currentAPI = '/react/';
+let currentAPI = '/rag/';
 let conversationHistory = [];
 let isSending = false;
+document.getElementById('rag-api-btn').classList.add('active');
 
-// API切换按钮事件
 document.getElementById('chat-api-btn').addEventListener('click', function() {
     currentAPI = '/chat/';
-    // 切换active类
     document.getElementById('chat-api-btn').classList.add('active');
     document.getElementById('react-api-btn').classList.remove('active');
-    // 清空对话历史和聊天框
+    document.getElementById('rag-api-btn').classList.remove('active');
     conversationHistory = [];
     document.getElementById('chat-box').innerHTML = '';
 });
 
 document.getElementById('react-api-btn').addEventListener('click', function() {
     currentAPI = '/react/';
-    // 切换active类
     document.getElementById('react-api-btn').classList.add('active');
     document.getElementById('chat-api-btn').classList.remove('active');
-    // 清空对话历史和聊天框
+    document.getElementById('rag-api-btn').classList.remove('active');
     conversationHistory = [];
     document.getElementById('chat-box').innerHTML = '';
 });
 
-// 发送消息事件
-document.getElementById('chat-form').addEventListener('submit', async function (event) {
-    event.preventDefault();
+document.getElementById('rag-api-btn').addEventListener('click', function() {
+    currentAPI = '/rag/';
+    document.getElementById('rag-api-btn').classList.add('active');
+    document.getElementById('chat-api-btn').classList.remove('active');
+    document.getElementById('react-api-btn').classList.remove('active');
+    conversationHistory = [];
+    document.getElementById('chat-box').innerHTML = '';
+});
 
+document.getElementById('chat-form').addEventListener('submit', async function(event) {
+    event.preventDefault();
     const messageInput = document.getElementById('message-input');
     const message = messageInput.value;
-
     if (message.trim() === '' || isSending) return;
-
     const chatBox = document.getElementById('chat-box');
     chatBox.innerHTML += `<div class="user-message">${message}</div>`;
-
     conversationHistory.push({ role: 'user', content: message });
-
     const sendButton = document.getElementById('send-button');
     sendButton.disabled = true;
     isSending = true;
-
     const response = await fetch(currentAPI, {
         method: 'POST',
         headers: {
@@ -48,7 +48,6 @@ document.getElementById('chat-form').addEventListener('submit', async function (
         },
         body: JSON.stringify(conversationHistory)
     });
-
     const assistantResponse = await response.json();
     conversationHistory.push({ role: 'assistant', content: assistantResponse });
     chatBox.innerHTML += `<div class="assistant-message">${assistantResponse}</div>`;
@@ -57,8 +56,7 @@ document.getElementById('chat-form').addEventListener('submit', async function (
     isSending = false;
 });
 
-// 清空聊天记录按钮事件
-document.getElementById('clear-button').addEventListener('click', function () {
+document.getElementById('clear-button').addEventListener('click', function() {
     const chatBox = document.getElementById('chat-box');
     chatBox.innerHTML = '';
     conversationHistory = [];

@@ -28,6 +28,22 @@ def get_messages4answer(messages, tool_result, prompt):
     return messages4answer
 
 
+def get_messages4rag(messages, documents, prompt):
+    history = []
+    if len(messages) > 1:
+        history = messages[:-1]
+    query = messages[-1]["content"]
+    prompt = prompt.format(source=json.dumps(documents), history=history, query=query)
+    print(colored(prompt, "green"))
+    messages4rag = messages + [
+        {
+            "role": "user",
+            "content": prompt,
+        },
+    ]
+    return messages4rag
+
+
 def get_tool_from_api(openapi_json):
     tools = []
     for path_key, path_val in openapi_json["paths"].items():

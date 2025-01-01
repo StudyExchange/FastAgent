@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     openai_base_url: str = ""
     openai_model_name: str = "gpt-4o-mini"
     base_url: str = "127.0.0.1:8000"
+    max_distance4rag: float = 0.4
     model_config = SettingsConfigDict(env_file=".env")
 
 

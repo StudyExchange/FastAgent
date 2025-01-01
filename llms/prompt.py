@@ -7,7 +7,7 @@ First, think about how to respond to the user's message.
 Then, if there is an available tool to call, do not answer the questions directly. Or not, answer the following questions as best you can. 
 You have access to the following:
 {tool_descs}
-
+\n
 Use the following format:
 History: a list of past interactions (if any)
 Question: the input question you must answer
@@ -18,7 +18,7 @@ Observation: the result of the action
 ... (this Thought/Action/Action Input/Observation can be repeated zero or more times)
 Thought: I now know the final answer
 Final Answer: the final answer to the original input question
-
+\n
 Begin!
 History: {history}
 Question: {query}
@@ -29,10 +29,10 @@ PROMPT_REACT = """
 First, think about how to respond to the user's message, planning and reasoning. 
 Then, if there is an available tool to call, try to call tool, rather than answer the questions directly. 
 Finally, if there is a perfect answer, set Finished=True; or not, Finished=False, let's think more turn.
-
+\n
 You have access to the following tools:
 {tool_descs}
-
+\n
 Use the following format:
 History: a list of past interactions (if any)
 Question: the input question you must answer
@@ -44,8 +44,22 @@ Observation: the result of the action
 Thought: I now know the final answer
 Finished: True/False
 Final Answer: the final answer to the original input question
-
+\n
 Begin!
+History: {history}
+Question: {query}
+"""
+
+
+PROMPT_RAG = """
+Answer the question by combining potentially useful documents found in the knowledge base vector database. 
+If the text found in the knowledge base has no reference value, there is no need to refer to it. 
+If the chat history has no reference value for the current issue, do not refer to the chat history. 
+If you don't know the answer, just say you don't know, don't try to fabricate the answer.
+\n
+You have retrieved the following documents:
+{source}
+\n
 History: {history}
 Question: {query}
 """

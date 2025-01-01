@@ -68,5 +68,6 @@ docs/_build/
 target/
 
 data/
+chroma_db/
 *.out
 .env

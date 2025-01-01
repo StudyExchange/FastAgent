@@ -18,3 +18,7 @@ openai
 pytest
 pytest-cov
 termcolor
+
+chromadb
+markdown
+python-docx

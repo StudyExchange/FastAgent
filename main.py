@@ -3,7 +3,7 @@ import re
 from typing import Any, List, Optional
 
 import uvicorn
-from fastapi import APIRouter, FastAPI, HTTPException, Request
+from fastapi import APIRouter, Depends, FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -13,20 +13,28 @@ from termcolor import colored
 from config import settings
 from entities.message import Message
 from llms.chat import chat_with_llm
-from llms.prompt import PROMPT_ANSWER, PROMPT_REACT, PROMPT_TOOL, TOOL_DESC
+from llms.prompt import PROMPT_ANSWER, PROMPT_RAG, PROMPT_REACT, PROMPT_TOOL
 from llms.tool_call import (
     execute_tool,
     get_messages4answer,
+    get_messages4rag,
     get_messages4tool,
     get_tool_from_api,
 )
 from routes import geometry
+from services.rag_service import RagService, get_rag_service
 
 app = FastAPI()
 app.include_router(geometry.router)
 
 app.mount("/static/", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
+
+
+@app.on_event("startup")
+async def startup_db_client():
+    rag_service = RagService()
+    rag_service.load_documents()
 
 
 @app.get("/", tags=["root"])
@@ -40,7 +48,7 @@ async def index(request: Request):
 
 
 @app.post("/chat/", tags=["root"])
-async def chat(messages: List[Message], request: Request):
+async def chat(request: Request, messages: List[Message]):
     if not messages:
         raise HTTPException(status_code=422, detail="messages is empty")
     messages = [item.model_dump() for item in messages]
@@ -88,10 +96,25 @@ async def react(request: Request, messages: List[Message], max_iterations: int =
         if tool_response.get("finished", "").lower() == "true":
             print(colored(f"Think step {idx+1}: finished!", "blue"))
             break
-
-    # Final response: Generate the final answer
     messages4answer = get_messages4answer(messages, tool_responses, PROMPT_ANSWER)
     response = await chat_with_llm(messages4answer)
+    print(colored(response, "red"))
+    return response
+
+
+@app.post("/rag/", tags=["root"])
+async def rag(messages: List[Message], rag_service: RagService = Depends(get_rag_service)):
+    if not messages:
+        raise HTTPException(status_code=422, detail="messages is empty")
+    messages = [item.model_dump() for item in messages]
+    query_text = messages[-1]["content"]
+    rag_results = rag_service.query(query_text)
+    documents = []
+    if rag_results.get("documents", []) and rag_results.get("documents", [])[0] and rag_results.get("distances", []) and rag_results.get("distances", [])[0]:
+        documents = [(dis, doc) for doc, dis in zip(rag_results.get("documents", [])[0], rag_results.get("distances", [])[0]) if dis <= settings.max_distance4rag]
+        print(colored(f"retrived documents: {documents}:", "blue"))
+    messages4rag = get_messages4rag(messages, documents, PROMPT_RAG)
+    response = await chat_with_llm(messages4rag)
     print(colored(response, "red"))
     return response
 
