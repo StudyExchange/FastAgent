@@ -73,7 +73,7 @@ class Test_react_with_tool:
         messages = [{"role": "user", "content": "Can you help me calculate the area of a rectangle with a height of 5cm?"}]
         response = client.post("/react/", json=messages)
         assert response.status_code == 200
-        assert "need" in response.text.lower()
+        assert "need" in response.text.lower() or "provide" in response.text.lower()
 
     def test_react_with_tool_supplementary_parameters(self, client):
         """

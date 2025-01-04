@@ -12,8 +12,12 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     openai_base_url: str = ""
     openai_model_name: str = "gpt-4o-mini"
-    base_url: str = "127.0.0.1:8000"
+    openai_embedding_name: str = "text-embedding-3-small"
+    vector_dim: int = 128
     max_distance4rag: float = 0.4
+    neo4j_url: str = ""
+    lightrag_working_dir: str = "./dickens"
+    lightrag_docs_dir: str = "./tests/assets/rag_docs"
     model_config = SettingsConfigDict(env_file=".env")
 
 

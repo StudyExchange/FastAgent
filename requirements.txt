@@ -19,6 +19,14 @@ pytest
 pytest-cov
 termcolor
 
-chromadb
 markdown
 python-docx
+
+lightrag-hku
+aioboto3
+ollama
+torch
+transformers
+nano_vectordb
+tenacity
+tiktoken

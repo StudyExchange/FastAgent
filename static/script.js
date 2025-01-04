@@ -1,13 +1,13 @@
-let currentAPI = '/rag/';
+let currentAPI = '/lightrag/';
 let conversationHistory = [];
 let isSending = false;
-document.getElementById('rag-api-btn').classList.add('active');
+document.getElementById('lightrag-api-btn').classList.add('active');
 
 document.getElementById('chat-api-btn').addEventListener('click', function() {
     currentAPI = '/chat/';
     document.getElementById('chat-api-btn').classList.add('active');
     document.getElementById('react-api-btn').classList.remove('active');
-    document.getElementById('rag-api-btn').classList.remove('active');
+    document.getElementById('lightrag-api-btn').classList.remove('active');
     conversationHistory = [];
     document.getElementById('chat-box').innerHTML = '';
 });
@@ -16,14 +16,14 @@ document.getElementById('react-api-btn').addEventListener('click', function() {
     currentAPI = '/react/';
     document.getElementById('react-api-btn').classList.add('active');
     document.getElementById('chat-api-btn').classList.remove('active');
-    document.getElementById('rag-api-btn').classList.remove('active');
+    document.getElementById('lightrag-api-btn').classList.remove('active');
     conversationHistory = [];
     document.getElementById('chat-box').innerHTML = '';
 });
 
-document.getElementById('rag-api-btn').addEventListener('click', function() {
-    currentAPI = '/rag/';
-    document.getElementById('rag-api-btn').classList.add('active');
+document.getElementById('lightrag-api-btn').addEventListener('click', function() {
+    currentAPI = '/lightrag/';
+    document.getElementById('lightrag-api-btn').classList.add('active');
     document.getElementById('chat-api-btn').classList.remove('active');
     document.getElementById('react-api-btn').classList.remove('active');
     conversationHistory = [];

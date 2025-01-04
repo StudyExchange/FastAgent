@@ -1,4 +1,5 @@
 import copy
+import os
 import re
 from typing import Any, List, Optional
 
@@ -34,7 +35,9 @@ templates = Jinja2Templates(directory="templates")
 @app.on_event("startup")
 async def startup_db_client():
     rag_service = RagService()
-    rag_service.load_documents()
+    if os.listdir(rag_service.working_dir):
+        return
+    await rag_service.load_documents()
 
 
 @app.get("/", tags=["root"])
@@ -102,21 +105,14 @@ async def react(request: Request, messages: List[Message], max_iterations: int =
     return response
 
 
-@app.post("/rag/", tags=["root"])
-async def rag(messages: List[Message], rag_service: RagService = Depends(get_rag_service)):
+@app.post("/lightrag/", tags=["root"])
+async def lightrag(messages: List[Message], rag_service: RagService = Depends(get_rag_service)):
     if not messages:
         raise HTTPException(status_code=422, detail="messages is empty")
     messages = [item.model_dump() for item in messages]
     query_text = messages[-1]["content"]
-    rag_results = rag_service.query(query_text)
-    documents = []
-    if rag_results.get("documents", []) and rag_results.get("documents", [])[0] and rag_results.get("distances", []) and rag_results.get("distances", [])[0]:
-        documents = [(dis, doc) for doc, dis in zip(rag_results.get("documents", [])[0], rag_results.get("distances", [])[0]) if dis <= settings.max_distance4rag]
-        print(colored(f"retrived documents: {documents}:", "blue"))
-    messages4rag = get_messages4rag(messages, documents, PROMPT_RAG)
-    response = await chat_with_llm(messages4rag)
-    print(colored(response, "red"))
-    return response
+    rag_results = await rag_service.query(query_text)
+    return rag_results
 
 
 if __name__ == "__main__":

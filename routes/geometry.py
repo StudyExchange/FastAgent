@@ -3,12 +3,12 @@ from fastapi import APIRouter, Body, FastAPI, File, HTTPException, UploadFile
 router = APIRouter()
 
 
-@router.get("/geometry/hello/", tags=["geometry"], summary="hello geometry.")
+@router.get("/geometry/hello/", tags=["hello"], summary="Check if the geometry API group works correctly.")
 async def get_hello():
     return "geometry works OK!"
 
 
-@router.post("/geometry/square_area/", tags=["geometry", "tool"], summary="Calculate the area of a square.")
+@router.post("/geometry/square_area/", tags=["tool"], summary="Calculate the area of a square.")
 def calculate_square_area(side: float):
     if side <= 0:
         raise HTTPException(status_code=400, detail="Side must be a positive number")
@@ -16,7 +16,7 @@ def calculate_square_area(side: float):
     return area
 
 
-@router.post("/geometry/triangle_area/", tags=["geometry", "tool"], summary="Calculate the area of a triangle.")
+@router.post("/geometry/triangle_area/", tags=["tool"], summary="Calculate the area of a triangle.")
 def calculate_triangle_area(base: float, height: float):
     if base <= 0 or height <= 0:
         raise HTTPException(status_code=400, detail="Base and height must be positive numbers")
@@ -24,7 +24,7 @@ def calculate_triangle_area(base: float, height: float):
     return area
 
 
-@router.post("/geometry/rectangle_area/", tags=["geometry", "tool"], summary="Calculate the area of a rectangle.")
+@router.post("/geometry/rectangle_area/", tags=["tool"], summary="Calculate the area of a rectangle.")
 def calculate_rectangle_area(length: float, width: float):
     if length <= 0 or width <= 0:
         raise HTTPException(status_code=400, detail="Length and width must be positive numbers")

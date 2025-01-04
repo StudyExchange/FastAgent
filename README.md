@@ -6,7 +6,7 @@ This is a lightweight, fast, high-concurrency agent framework based on FastAPI. 
 - By default, interfaces containing "tool" in "tag" are considered as callable tools.
 - If the tool cannot be called, return a final answer. The final answer may be for the user to provide additional information, or it may be based on the ability of the large model itself to directly answer the user's question.
 - ReAct for planing and reasoning.
-- RAG based on chromadb.
+- Use [LightRAG](https://github.com/HKUDS/LightRAG), which is faster than [GraphRAG](https://github.com/microsoft/graphrag).
 - High-concurrency asynchronous based on FastAPI.
 
 
@@ -75,11 +75,14 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 
 
 ## Useage
-Open ```http://127.0.0.1:8000/frontend``` at local browser.
-<img src="./assets/LLM answer.png">
-<img src="./assets/LLM call func.png">
-<img src="./assets/LLM RAG.png">
-
+- Open ```http://127.0.0.1:8000/frontend``` at local browser.
+<img src="./assets/Chat.png">
+<img src="./assets/ReAct.png">
+<img src="./assets/LightRAG.png">
+- Reload documents for LightRAG
+```
+python -m services.rag_service
+```
 
 ## Swagger docs
 Open ```http://127.0.0.1:8000/docs``` at local browser.

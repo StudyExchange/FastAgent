@@ -69,5 +69,7 @@ target/
 
 data/
 chroma_db/
+dickens/
+
 *.out
 .env

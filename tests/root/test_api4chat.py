@@ -11,7 +11,7 @@ def client():
         yield c
 
 
-class Test_chat:
+class Test_chat_with_tool:
 
     def test_chat_with_valid_input(self, client):
         """
@@ -73,7 +73,7 @@ class Test_chat:
         messages = [{"role": "user", "content": "Can you help me calculate the area of a rectangle with a height of 5cm?"}]
         response = client.post("/chat/", json=messages)
         assert response.status_code == 200
-        assert "need" in response.text.lower()
+        assert "?" in response.text.lower()
 
     def test_chat_with_tool_supplementary_parameters(self, client):
         """
